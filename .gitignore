@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+
+# Database & local data
+backend/app.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs & Environment
+*.log
+npm-debug.log*
+.env
+.env.local
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
