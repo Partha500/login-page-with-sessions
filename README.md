@@ -34,7 +34,9 @@ A lightweight, full-stack authentication web application demonstrating **statefu
 ## Features
 
 - **Session-Based Authentication:** Employs `express-session` to issue HTTP cookies and maintain authenticated user state across requests with `credentials: 'include'`.
+- **Session Lifecycle & Expiry:** Enforces cookie timeout (`maxAge`) and clean session teardown via `/logout` (`req.session.destroy` + `res.clearCookie`).
 - **Protected Routes & Auth Guard:** Includes `isAuthenticated` middleware to guard private endpoints (`/profile`) and redirect unauthorized visitors.
+- **Error Handling & 404 Routing:** Centralized 404 handler for missing routes and 4-parameter error-handling middleware for JSON parsing issues and server faults.
 - **Cryptographic Password Security:** Hashes all user passwords using `bcrypt` (10 salt rounds) before persistence to safeguard against credential leakage and rainbow table attacks.
 - **Native Embedded Database:** Leverages Node 22's built-in `node:sqlite` (`DatabaseSync`), eliminating bulky native external database bindings or external daemon requirements.
 - **Robust Input Validation:** Server-side checks ensure required fields, duplicate email prevention, and password length policies before execution.
@@ -72,6 +74,7 @@ login-page-with-sessions/
 | `GET` | `/about` | Project description metadata | None | `200 OK` (JSON) |
 | `POST` | `/register` | Register a new user account | `{ username, email, password }` | `201 Created` / `400 Bad Request` / `409 Conflict` |
 | `POST` | `/login` | Authenticate credentials & initiate session | `{ email, password }` | `200 OK` / `400 Bad Request` / `401 Unauthorized` |
+| `POST` | `/logout` | Destroy session & clear session cookie | None (`Cookie`) | `200 OK` / `500 Internal Error` |
 | `GET` | `/profile` | Fetch authenticated user details (Protected) | None (`Cookie`) | `200 OK` / `401 Unauthorized` |
 
 ---

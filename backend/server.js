@@ -23,12 +23,13 @@ app.use(express.json()); // for express to understand incoming json
 // bcrypt 
 const bcrypt = require('bcrypt');
 
-//session id 
+//session id with step 7 session expiry
 const session = require('express-session');
 app.use(session({
    secret: 'dev-secret-change-later',
    resave: false,
-   saveUninitialized: false
+   saveUninitialized: false,
+   cookie: {maxAge: 1000 * 20  } // 30 min  1000 * 20 means 20 sec 
 }));
 
 // isAuthenticated step 6 
@@ -119,6 +120,34 @@ app.get('/profile', isAuthenticated, (req, res) => {
   }
 
   res.json({ user });
+});
+
+//logout route 
+app.post('/logout', (req,res) => {
+   req.session.destroy((err) => {
+    if(err){
+        return res.status(500).json({error: 'Could not log out'});
+    }
+    res.clearCookie('connect.sid');
+    res.json({message: 'Logged out'});
+   });
+});
+
+
+// 404: no route matched
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// global error handler: 4 parameters
+app.use((err, req, res, next) => {
+  console.log(err);                       // the real error stays in the terminal
+
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Invalid JSON in request body' });
+  }
+
+  res.status(500).json({ error: 'Something went wrong' });
 });
 
 
