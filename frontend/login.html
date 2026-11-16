@@ -24,13 +24,17 @@
            const response = await fetch('http://localhost:3000/login', {
                  method: 'POST',
                  headers: {'Content-Type': 'application/json'},
-                 credentials: 'include',
+                 credentials: 'include', // for the browser to include the cookie 
                  body: JSON.stringify({email,password})
            });
 
            const data = await response.json();
-           document.getElementById('message').textContent = 
-           response.ok ? data.message : data.error;
+    
+           if(response.ok){
+            window.location.href='profile.html';
+           }else{
+            document.getElementById('message').textContent = data.error
+           }
         });
     </script>
 </body>

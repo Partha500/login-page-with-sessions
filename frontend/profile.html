@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head><title>Profile</title></head>
+<body>
+  <h1>My Profile</h1>
+  <p id="username">Loading...</p>
+  <p id="email"></p>
+  <p id="created"></p>
+  <p id="message"></p>
+
+  <script>
+    async function loadProfile() {
+      const response = await fetch('http://localhost:3000/profile', {
+        credentials: 'include'
+      });
+
+      if (response.status === 401) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const data = await response.json();
+      document.getElementById('username').textContent = 'Username: ' + data.user.username;
+      document.getElementById('email').textContent = 'Email: ' + data.user.email;
+      document.getElementById('created').textContent = 'Joined: ' + data.user.created_at;
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

@@ -31,6 +31,15 @@ app.use(session({
    saveUninitialized: false
 }));
 
+// isAuthenticated step 6 
+function isAuthenticated(req,res,next){
+    if(req.session.userId){   // req.session.userId exists only if /login set it for this session
+        return next();
+    }
+    res.status(401).json({error: 'Not logged in'});
+}
+
+
 // -------------- Routes ----------------------
 
 app.get('/',(req,res) => {
@@ -89,7 +98,7 @@ app.post('/login', (req,res) => {
         return res.status(400).json({error: 'Email and password are required '});
      }
      // chacking the hashed passsword
-     const user =db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
      const ok = user && bcrypt.compareSync(password,user.password);
      if(!ok){
         return res.status(401).json({error: 'Invalid email or password'});
@@ -97,6 +106,21 @@ app.post('/login', (req,res) => {
 req.session.userId = user.id; // the session is created here 
 res.json({message: 'Logged in'});
 });
+
+
+// isAthenticated protected route 
+app.get('/profile', isAuthenticated, (req, res) => {
+  const user = db
+    .prepare('SELECT id, username, email, created_at FROM users WHERE id = ?')
+    .get(req.session.userId);
+
+  if (!user) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  res.json({ user });
+});
+
 
 // listens for traffic in port 3000 
 app.listen(3000, () => {
